@@ -1,4 +1,5 @@
 use nannou::prelude::*;
+use rand::distributions::Alphanumeric;
 use rand::prelude::*;
 
 #[derive(Debug, Copy, Clone)]
@@ -7,6 +8,7 @@ struct StyledRect {
     fill_color: Rgb8,
     stroke_weight: f32,
     stroke_color: Rgb8,
+    styled: bool,
 }
 
 impl StyledRect {
@@ -16,6 +18,7 @@ impl StyledRect {
             fill_color: WHITE,
             stroke_weight: 1.0,
             stroke_color: BLACK,
+            styled: false,
         }
     }
 }
@@ -29,8 +32,10 @@ struct Model {
 }
 
 fn model(app: &App) -> Model {
+    app.set_loop_mode(LoopMode::Wait);
+
     let win = app.main_window().rect();
-    let square_size = 16.0;
+    let square_size = 32.0;
     let grid = build_grid(&win, square_size);
 
     Model { grid }
@@ -38,16 +43,23 @@ fn model(app: &App) -> Model {
 
 fn event(app: &App, model: &mut Model, event: Event) {
     match event {
+        Event::WindowEvent {
+            id: _,
+            simple: Some(KeyPressed(Key::S)),
+        } => {
+            app.main_window().capture_frame(generate_file_name(app));
+        }
         Event::WindowEvent { id: _, simple: _ } => {
             let position = app.mouse.buttons.left().if_down();
             match position {
                 Some(position) => {
-                    let rects = &mut model.grid;
-                    for rect in rects {
-                        if rect.rect.contains(position) {
+                    let styled_rects = &mut model.grid;
+                    for styled_rect in styled_rects {
+                        if styled_rect.rect.contains(position) && styled_rect.styled == false {
                             let rgb = generate_random_color();
-                            rect.stroke_color = Rgb8::new(rgb.0, rgb.1, rgb.2);
-                            rect.fill_color = Rgb8::new(rgb.0, rgb.1, rgb.2);
+                            styled_rect.stroke_color = Rgb8::new(rgb.0, rgb.1, rgb.2);
+                            styled_rect.fill_color = Rgb8::new(rgb.0, rgb.1, rgb.2);
+                            styled_rect.styled = true;
                         }
                     }
                 }
@@ -113,4 +125,10 @@ fn generate_random_color() -> (u8, u8, u8) {
     let b = rng.gen_range(0, 255);
 
     (r, g, b)
+}
+
+fn generate_file_name(app: &App) -> String {
+    let file_entropy: String = thread_rng().sample_iter(&Alphanumeric).take(10).collect();
+
+    app.exe_name().unwrap() + "_" + &file_entropy + ".png"
 }

@@ -1,6 +1,6 @@
 [package]
 name = "click_the_square"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["HopesHigh"]
 edition = "2018"
 
