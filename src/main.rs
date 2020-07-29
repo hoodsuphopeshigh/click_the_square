@@ -45,6 +45,12 @@ fn event(app: &App, model: &mut Model, event: Event) {
     match event {
         Event::WindowEvent {
             id: _,
+            simple: Some(KeyPressed(Key::C)),
+        } => {
+            clear_screen(model);
+        }
+        Event::WindowEvent {
+            id: _,
             simple: Some(KeyPressed(Key::S)),
         } => {
             app.main_window().capture_frame(generate_file_name(app));
@@ -125,6 +131,15 @@ fn generate_random_color() -> (u8, u8, u8) {
     let b = rng.gen_range(0, 255);
 
     (r, g, b)
+}
+
+fn clear_screen(model: &mut Model) {
+    let styled_rects = &mut model.grid;
+    for styled_rect in styled_rects {
+        styled_rect.stroke_color = BLACK;
+        styled_rect.fill_color = WHITE;
+        styled_rect.styled = false;
+    }
 }
 
 fn generate_file_name(app: &App) -> String {

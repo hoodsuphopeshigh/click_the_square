@@ -135,7 +135,7 @@ dependencies = [
 
 [[package]]
 name = "click_the_square"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "nannou",
  "rand 0.7.3",
